@@ -1,13 +1,13 @@
 import { Routes, Route } from 'react-router-dom';
 import Layout from './pages/Layout';
 import Login from './pages/authentication/Login';
-import Register from './pages/authentication/Register';
 import Unauthorized from './pages/authentication/Unauthorized';
 import UserHomePage from './pages/UserHomePage';
 import SuperVisorHomePage from './pages/SuperVisorHomePage';
 import AdminHomePage from './pages/AdminHomePage';
 import NotFound from './pages/NotFound';
 import RequireAuth from './components/RequireAuth';
+import RegisterStep1 from './pages/authentication/register/RegisterStep1';
 
 const ROLES = {
     'Admin': 'Admin',
@@ -20,7 +20,7 @@ const Root = () => {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
+        <Route path="register" element={<RegisterStep1 />} />
         <Route path="unauthorized" element={<Unauthorized />} />
 
         <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
@@ -28,7 +28,7 @@ const Root = () => {
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.SuperVisor]} />}>
-          <Route path="editor" element={<SuperVisorHomePage />} />
+          <Route path="super-visor" element={<SuperVisorHomePage />} />
         </Route>
 
 
