@@ -8,8 +8,8 @@ const NotFound = () => {
 
   const lottieOptions = {
     animationData: animation,
-    width: isMobile ? 150 : 250,  // Dostosowany rozmiar dla mobilnych i desktopów
-    height: isMobile ? 150 : 250, // Dostosowany rozmiar dla mobilnych i desktopów
+    width: isMobile ? 150 : 250,
+    height: isMobile ? 150 : 250,
   };
 
   return (

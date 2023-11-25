@@ -10,10 +10,10 @@ import RequireAuth from './components/RequireAuth';
 import RegisterStep1 from './pages/authentication/register/RegisterStep1';
 
 const ROLES = {
-    'Admin': 'Admin',
-    'SuperVisor': 'SuperVisor',
-    'User': 'User'
-  }
+  'Admin': 'Admin',
+  'SuperVisor': 'SuperVisor',
+  'User': 'User'
+}
 
 const Root = () => {
   return (

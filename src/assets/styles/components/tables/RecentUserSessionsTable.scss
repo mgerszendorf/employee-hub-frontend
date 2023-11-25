@@ -1,0 +1,12 @@
+@import "../../abstracts/variables";
+
+.recent-user-session-table-container {
+    .top-bar {
+        margin-bottom: 20px;
+        position: sticky;
+        top: 0;
+        background-color: $background;
+        z-index: 1;
+        padding: 10px 0;
+    }
+}

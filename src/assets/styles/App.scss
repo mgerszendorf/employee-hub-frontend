@@ -1,6 +1,8 @@
 @import "./abstracts/variables";
 @import url('./pages/authentication/Register.scss');
 @import url('./pages/authentication/Login.scss');
+@import url('./pages/UserHomePage.scss');
+@import url('./components/tables/RecentUserSessionsTable.scss');
 
 * {
   margin: 0;
