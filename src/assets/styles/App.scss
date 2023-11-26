@@ -2,7 +2,11 @@
 @import url('./pages/authentication/Register.scss');
 @import url('./pages/authentication/Login.scss');
 @import url('./pages/UserHomePage.scss');
+@import url('./pages/SuperVisorHomePage.scss');
+@import url('./pages/EmployeeSessions.scss');
 @import url('./components/tables/RecentUserSessionsTable.scss');
+@import url('./components/tables/EmployeeListTable.scss');
+@import url('./components/tables/EmployeeSessionsTable.scss');
 
 * {
   margin: 0;

@@ -3,11 +3,12 @@ import Layout from './pages/Layout';
 import Login from './pages/authentication/Login';
 import Unauthorized from './pages/authentication/Unauthorized';
 import UserHomePage from './pages/UserHomePage';
-import SuperVisorHomePage from './pages/SuperVisorHomePage';
+import SuperVisorHomePage from './pages/superVisor/SuperVisorHomePage';
 import AdminHomePage from './pages/AdminHomePage';
 import NotFound from './pages/NotFound';
 import RequireAuth from './components/RequireAuth';
 import RegisterStep1 from './pages/authentication/register/RegisterStep1';
+import EmployeeSessions from './pages/superVisor/EmployeeSessions';
 
 const ROLES = {
   'Admin': 'Admin',
@@ -29,6 +30,7 @@ const Root = () => {
 
         <Route element={<RequireAuth allowedRoles={[ROLES.SuperVisor]} />}>
           <Route path="super-visor" element={<SuperVisorHomePage />} />
+          <Route path="/employee-sessions/:id" element={<EmployeeSessions />} />
         </Route>
 
 

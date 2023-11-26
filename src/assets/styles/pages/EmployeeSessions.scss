@@ -1,0 +1,25 @@
+.employee-sessions-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    padding: 2rem;
+
+    .employee-sessions-top-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+        flex: 0 0 auto;
+
+        p {
+            font-size: 20px;
+            font-weight: bold;
+        }
+    }
+
+    .employee-list {
+        margin-top: 30px;
+        flex-grow: 1;
+        overflow: auto;
+    }
+}
