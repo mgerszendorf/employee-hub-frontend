@@ -4,9 +4,11 @@
 @import url('./pages/UserHomePage.scss');
 @import url('./pages/SuperVisorHomePage.scss');
 @import url('./pages/EmployeeSessions.scss');
+@import url('./pages/AdminHomePage.scss');
 @import url('./components/tables/RecentUserSessionsTable.scss');
 @import url('./components/tables/EmployeeListTable.scss');
 @import url('./components/tables/EmployeeSessionsTable.scss');
+@import url('./components/tables/UsersListTable.scss');
 
 * {
   margin: 0;
