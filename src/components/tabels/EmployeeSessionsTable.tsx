@@ -18,7 +18,7 @@ const EmployeeSessionsTable = ({ data }: EmployeeSessionsTableProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [sessionData, setSessionData] = useState<RowData>();
-    
+
     const handleCloseModal = () => setIsModalOpen(false);
 
     const handleAddClick = () => {
