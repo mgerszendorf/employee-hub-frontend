@@ -2,10 +2,11 @@ import { Button } from "@mui/material"
 import { useEffect, useState } from "react";
 import UsersListTable from "../components/tabels/UsersListTable";
 import { useFetchAllUsers } from "../api/users/getUsers.service";
+import { Loader } from "../components/Loader";
 
 const AdminHomePage = () => {
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleString());
-    const { data: users, refetch: refetchUsers } = useFetchAllUsers();
+    const { data: users, isLoading: usersIsLoading, refetch: refetchUsers } = useFetchAllUsers();
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -53,6 +54,7 @@ const AdminHomePage = () => {
                     : null
                 }
             </div>
+            {usersIsLoading && <Loader />}
         </div>
     )
 }

@@ -5,6 +5,7 @@ import { WorktimeSessionContext } from "../context/WorktimeSessionContext";
 import WorktimeSessionModal from "../components/madals/WorktimeSessionModal";
 import { useGetUserSessionByIdQuery } from "../api/worktime/getUserSessionById.service";
 import AuthContext from "../context/AuthContext";
+import { Loader } from "../components/Loader";
 
 const UserHomePage = () => {
     const { handleWorktimeSession, isStartSessionActive, isFinishSessionActive, setIsStartSessionActive, setIsFinishSessionActive } = useContext(WorktimeSessionContext);
@@ -14,6 +15,7 @@ const UserHomePage = () => {
 
     const {
         data: getUserSessionByIdData,
+        isLoading: sessionsIsLoading,
         refetch: refetchGetUserSessionByIdData,
     } = useGetUserSessionByIdQuery(user?.id!, accessToken!);
 
@@ -109,6 +111,7 @@ const UserHomePage = () => {
                 <div className="recent-user-sessions">
                     <RecentUserSessionsTable data={transformedData} onRefresh={refetchGetUserSessionByIdData} />
                 </div>
+                {sessionsIsLoading && <Loader />}
             </div>
             <WorktimeSessionModal open={isModalOpen} handleClose={handleCloseModal} refetchGetUserSessionByIdData={refetchGetUserSessionByIdData} />
         </>

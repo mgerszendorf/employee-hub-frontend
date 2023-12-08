@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button } from "@mui/material";
 import { useGetUserSessionByIdQuery } from "../../api/worktime/getUserSessionById.service";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import AuthContext from "../../context/AuthContext";
+import { Loader } from "../../components/Loader";
 
 const EmployeeSessions = () => {
     const { accessToken } = useContext(AuthContext);
@@ -14,6 +15,7 @@ const EmployeeSessions = () => {
 
     const {
         data: getUserSessionByIdData,
+        isLoading: sessionsIsLoading,
         refetch: refetchGetUserSessionByIdData,
     } = useGetUserSessionByIdQuery(id!, accessToken!);
 
@@ -43,6 +45,7 @@ const EmployeeSessions = () => {
             <div className="employee-sessions-list">
                 <EmployeeSessionsTable data={transformedData} refetchGetUserSessionByIdData={refetchGetUserSessionByIdData} />
             </div>
+            {sessionsIsLoading && <Loader />}
         </div>
     )
 }

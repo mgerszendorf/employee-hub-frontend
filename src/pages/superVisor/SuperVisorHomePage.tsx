@@ -3,11 +3,12 @@ import { useContext, useEffect, useState } from "react";
 import EmployeeListTable from "../../components/tabels/EmployeeListTable";
 import AuthContext from "../../context/AuthContext";
 import { useFetchAllUsers } from "../../api/users/getUsers.service";
+import { Loader } from "../../components/Loader";
 
 const SuperVisorHomePage = () => {
     const { user } = useContext(AuthContext);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleString());
-    const { data: users } = useFetchAllUsers();
+    const { data: users, isLoading: usersIsLoading } = useFetchAllUsers();
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -54,6 +55,7 @@ const SuperVisorHomePage = () => {
             <div className="employee-list">
                 <EmployeeListTable data={transformedData} />
             </div>
+            {usersIsLoading && <Loader />}
         </div>
     )
 }
