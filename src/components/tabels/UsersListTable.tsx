@@ -4,6 +4,7 @@ import UserModal from '../madals/UserModal';
 import AuthContext from '../../context/AuthContext';
 import AdminActivationModal from '../madals/AdminActivationModal';
 import { useDeleteUserMutation } from '../../api/users/deleteUser.service';
+import { ToastNotificationContext } from '../../context/ToastNotificationContext';
 
 interface RowData {
     id: string | null;
@@ -21,6 +22,7 @@ interface UsersListTableProps {
 
 const UsersListTable = ({ data, refetchUsers }: UsersListTableProps) => {
     const { accessToken, handleRefreshToken } = useContext(AuthContext);
+    const { showToastNotification } = useContext(ToastNotificationContext);
 
     const [selectedRow, setSelectedRow] = useState<RowData | null>(null);
     const [isActivationModalOpen, setIsActivationModalOpen] = useState(false);
@@ -60,8 +62,8 @@ const UsersListTable = ({ data, refetchUsers }: UsersListTableProps) => {
                 onSuccess: () => {
                     refetchUsers()
                 },
-                onError: (error) => {
-                    console.error('Error deleting session:', error);
+                onError: () => {
+                    showToastNotification('Something went wrong', 'error');
                 },
             });
         }

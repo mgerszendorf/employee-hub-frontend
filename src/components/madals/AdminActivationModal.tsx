@@ -3,6 +3,7 @@ import { useContext, useState } from 'react';
 import { useActivateUserMutation } from '../../api/users/activateUser.service';
 import AuthContext from '../../context/AuthContext';
 import { useGetAllSupervisorsQuery } from '../../api/users/getSupervisors.service';
+import { ToastNotificationContext } from '../../context/ToastNotificationContext';
 
 interface AdminActivationModalProps {
     open: boolean;
@@ -27,22 +28,28 @@ const AdminActivationModal = ({ open, handleClose, userId, refetchUsers }: Admin
     );
 
     const { data: supervisors } = useGetAllSupervisorsQuery(handleRefreshToken, accessToken!);
+    const { showToastNotification } = useContext(ToastNotificationContext);
 
     const handleActivation = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (userId) {
-            mutate({ userId, role, supervisorId }, {
+            mutate({
+                userId,
+                role,
+                ...(supervisorId && { supervisorId })
+            }, {
                 onSuccess: () => {
-                    handleClose()
-                    setRole('')
-                    refetchUsers()
+                    handleClose();
+                    setRole('');
+                    setSupervisorId('');
+                    refetchUsers();
                 },
-                onError: (err) => {
-                    console.error('Activation error:', err);
+                onError: () => {
+                    showToastNotification('Something went wrong', 'error');
                 }
             });
         } else {
-
+            showToastNotification('You do not have userId', 'error')
         }
     };
 

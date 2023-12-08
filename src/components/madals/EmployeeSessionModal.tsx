@@ -4,6 +4,7 @@ import AuthContext from '../../context/AuthContext';
 import { useUpdateWorktimeSessionMutation } from '../../api/worktime/updateWorktimeSession.service';
 import { useAddWorktimeSessionMutation } from '../../api/worktime/addWorktimeSession.service';
 import { useParams } from 'react-router-dom';
+import { ToastNotificationContext } from '../../context/ToastNotificationContext';
 
 interface EmployeeSessionData {
     id: string | null;
@@ -22,6 +23,7 @@ interface EmployeeSessionModalProps {
 
 const EmployeeSessionModal = ({ open, handleClose, sessionData, isEditMode, refetchGetUserSessionByIdData }: EmployeeSessionModalProps) => {
     const { accessToken, handleRefreshToken, user } = useContext(AuthContext);
+    const { showToastNotification } = useContext(ToastNotificationContext);
     const { id } = useParams();
 
     // State initialization
@@ -61,7 +63,7 @@ const EmployeeSessionModal = ({ open, handleClose, sessionData, isEditMode, refe
                     handleClose()
                     refetchGetUserSessionByIdData()
                 },
-                onError: (error) => console.error('Update error:', error)
+                onError: () => showToastNotification('Something went wrong', 'error')
             });
         } else {
             addWorktimeSession({
@@ -72,7 +74,7 @@ const EmployeeSessionModal = ({ open, handleClose, sessionData, isEditMode, refe
                     handleClose()
                     refetchGetUserSessionByIdData()
                 },
-                onError: (error: any) => console.error('Add error:', error)
+                onError: () => showToastNotification('Something went wrong', 'error')
             });
         }
     };

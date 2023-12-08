@@ -2,6 +2,7 @@ import { Modal, Box, TextField, Button, Typography } from '@mui/material';
 import { useUpdateUserByIdMutation } from '../../api/account/updateUserById.service';
 import { useContext, useEffect, useState } from 'react';
 import AuthContext from '../../context/AuthContext';
+import { ToastNotificationContext } from '../../context/ToastNotificationContext';
 
 interface UserData {
     id: string | null;
@@ -21,6 +22,7 @@ interface UserModalProps {
 
 const UserModal = ({ open, handleClose, sessionData, isEditMode, refetchUsers }: UserModalProps) => {
     const { accessToken, handleRefreshToken } = useContext(AuthContext);
+    const { showToastNotification } = useContext(ToastNotificationContext);
 
     // State initialization
     const [formData, setFormData] = useState<UserData>({
@@ -60,8 +62,8 @@ const UserModal = ({ open, handleClose, sessionData, isEditMode, refetchUsers }:
                 handleClose()
                 refetchUsers()
             },
-            onError: (error) => {
-                console.error('Update error:', error);
+            onError: () => {
+                showToastNotification('Something went wrong', 'error')
             },
         });
     };

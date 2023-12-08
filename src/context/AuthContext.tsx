@@ -49,6 +49,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     useEffect(() => {
         const defaultRoute = roleToDefaultRoute[user?.roles.$values[0] as keyof typeof roleToDefaultRoute];
         navigate(defaultRoute)
+        if (user?.roles.$values.length as number === 0 && user?.firstName) {
+            showToastNotification('Your account does not have a role yet. Report to the administrator.', 'error')
+        }
     }, [user])
 
     //Update Token

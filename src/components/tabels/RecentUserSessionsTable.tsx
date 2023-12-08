@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { formatDate } from '../../utils/formatDate';
 import { useDeleteWorktimeSessionMutation } from '../../api/worktime/deleteWorktimeSession.service';
 import AuthContext from '../../context/AuthContext';
+import { ToastNotificationContext } from '../../context/ToastNotificationContext';
 
 interface RowData {
     id: string;
@@ -18,6 +19,7 @@ interface RecentUserSessionsTableProps {
 
 const RecentUserSessionsTable: React.FC<RecentUserSessionsTableProps> = ({ data, onRefresh }) => {
     const { accessToken, handleRefreshToken } = useContext(AuthContext);
+    const { showToastNotification } = useContext(ToastNotificationContext);
     const { mutate: deleteSession } = useDeleteWorktimeSessionMutation(handleRefreshToken, accessToken!);
     const [selectedRow, setSelectedRow] = useState<string | null>(null);
 
@@ -35,8 +37,8 @@ const RecentUserSessionsTable: React.FC<RecentUserSessionsTableProps> = ({ data,
                 onSuccess: () => {
                     onRefresh();
                 },
-                onError: (error) => {
-                    console.error('Error deleting session:', error);
+                onError: () => {
+                    showToastNotification('Something went wrong', 'error');
                 },
             });
         }

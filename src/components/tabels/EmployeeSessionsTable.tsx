@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import EmployeeSessionModal from '../madals/EmployeeSessionModal';
 import { useDeleteWorktimeSessionMutation } from '../../api/worktime/deleteWorktimeSession.service';
 import AuthContext from '../../context/AuthContext';
+import { ToastNotificationContext } from '../../context/ToastNotificationContext';
 
 interface RowData {
     id: string | null;
@@ -23,6 +24,7 @@ const EmployeeSessionsTable = ({ data, refetchGetUserSessionByIdData }: Employee
     const [sessionData, setSessionData] = useState<RowData>();
 
     const { accessToken, handleRefreshToken } = useContext(AuthContext);
+    const { showToastNotification } = useContext(ToastNotificationContext);
     const { mutate: deleteSession } = useDeleteWorktimeSessionMutation(handleRefreshToken, accessToken!);
 
     const handleCloseModal = () => setIsModalOpen(false);
@@ -54,8 +56,8 @@ const EmployeeSessionsTable = ({ data, refetchGetUserSessionByIdData }: Employee
                 onSuccess: () => {
                     refetchGetUserSessionByIdData();
                 },
-                onError: (error) => {
-                    console.error('Error deleting session:', error);
+                onError: () => {
+                    showToastNotification('Something went wrong', 'error');
                 },
             });
         }
