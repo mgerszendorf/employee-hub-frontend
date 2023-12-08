@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Radio, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import EmployeeModal from '../madals/EmployeeModal';
 
 interface RowData {
-    id: number;
-    name: string;
-    surname: string;
-    department: string;
+    id: string | null;
+    firstName: string;
+    lastName: string;
     email: string;
     phoneNumber: string;
 }
@@ -19,18 +17,10 @@ interface EmployeeListTableProps {
 const EmployeeListTable: React.FC<EmployeeListTableProps> = ({ data }) => {
     const [selectedRow, setSelectedRow] = useState<RowData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [sessionData, setSessionData] = useState<RowData>();
-    
+
     const navigate = useNavigate();
 
     const handleCloseModal = () => setIsModalOpen(false);
-
-    const handleEditClick = (selectedRow: RowData) => {
-        setIsEditMode(true);
-        setSessionData(selectedRow);
-        setIsModalOpen(true);
-    };
 
     const handleRowClick = (row: RowData) => {
         if (selectedRow && selectedRow.id === row.id) {
@@ -41,7 +31,7 @@ const EmployeeListTable: React.FC<EmployeeListTableProps> = ({ data }) => {
     };
 
     const handleShowSessions = () => {
-        if(selectedRow && selectedRow.id) {
+        if (selectedRow && selectedRow.id) {
             navigate(`/employee-sessions/${selectedRow.id}`)
         }
     };
@@ -59,14 +49,6 @@ const EmployeeListTable: React.FC<EmployeeListTableProps> = ({ data }) => {
                     >
                         Show sessions
                     </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        disabled={!selectedRow}
-                        onClick={() => handleEditClick(selectedRow!)}
-                    >
-                        Edit
-                    </Button>
                 </div>
                 <TableContainer component={Paper} id='table'>
                     <Table>
@@ -75,7 +57,6 @@ const EmployeeListTable: React.FC<EmployeeListTableProps> = ({ data }) => {
                                 <TableCell></TableCell>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Surname</TableCell>
-                                <TableCell>Department</TableCell>
                                 <TableCell>E-mail</TableCell>
                                 <TableCell>Phone number</TableCell>
                             </TableRow>
@@ -94,9 +75,8 @@ const EmployeeListTable: React.FC<EmployeeListTableProps> = ({ data }) => {
                                             onChange={() => handleRowClick(row)}
                                         />
                                     </TableCell>
-                                    <TableCell>{row.name}</TableCell>
-                                    <TableCell>{row.surname}</TableCell>
-                                    <TableCell>{row.department}</TableCell>
+                                    <TableCell>{row.firstName}</TableCell>
+                                    <TableCell>{row.lastName}</TableCell>
                                     <TableCell>{row.email}</TableCell>
                                     <TableCell>{row.phoneNumber}</TableCell>
                                 </TableRow>
@@ -105,7 +85,6 @@ const EmployeeListTable: React.FC<EmployeeListTableProps> = ({ data }) => {
                     </Table>
                 </TableContainer>
             </div>
-            <EmployeeModal open={isModalOpen} handleClose={handleCloseModal} isEditMode={isEditMode} sessionData={sessionData} />
         </>
     );
 };

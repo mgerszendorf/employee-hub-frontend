@@ -1,22 +1,11 @@
 import { Button } from "@mui/material"
 import { useEffect, useState } from "react";
 import UsersListTable from "../components/tabels/UsersListTable";
+import { useFetchAllUsers } from "../api/users/getUsers.service";
 
 const AdminHomePage = () => {
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleString());
-
-    const sampleData = [
-        { id: 1, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 2, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 3, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 4, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 5, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 6, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 7, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 8, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 9, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 10, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-    ];
+    const { data: users, refetch: refetchUsers } = useFetchAllUsers();
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -26,13 +15,30 @@ const AdminHomePage = () => {
         return () => clearInterval(timer);
     }, []);
 
+    const handleLogOut = () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        location.reload()
+    }
+
+    const transformedData = users?.$values?.map(item => ({
+        id: item.id,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        email: item.email,
+        phoneNumber: item.phoneNumber,
+        active: item.active
+    })) ?? [];
+
     return (
         <div className="admin-home-page-container">
             <div className="admin-home-page-top-bar">
                 <div>
-                    <p>Marek Gerszendorf</p>
+                    <p>Admin</p>
                     <Button
                         variant="contained"
+                        onClick={handleLogOut}
                     >
                         Log Out
                     </Button>
@@ -42,7 +48,10 @@ const AdminHomePage = () => {
                 </div>
             </div>
             <div className="users-list">
-                <UsersListTable data={sampleData} />
+                {users ?
+                    <UsersListTable data={transformedData} refetchUsers={refetchUsers} />
+                    : null
+                }
             </div>
         </div>
     )

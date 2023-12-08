@@ -1,29 +1,35 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Radio, Button } from '@mui/material';
 import EmployeeSessionModal from '../madals/EmployeeSessionModal';
+import { useDeleteWorktimeSessionMutation } from '../../api/worktime/deleteWorktimeSession.service';
+import AuthContext from '../../context/AuthContext';
 
 interface RowData {
-    id: number | null;
-    startSession: string;
-    endSession: string;
+    id: string | null;
+    start: string;
+    end: string;
     description: string;
 }
 
 interface EmployeeSessionsTableProps {
     data: RowData[];
+    refetchGetUserSessionByIdData: () => Promise<any>;
 }
 
-const EmployeeSessionsTable = ({ data }: EmployeeSessionsTableProps) => {
+const EmployeeSessionsTable = ({ data, refetchGetUserSessionByIdData }: EmployeeSessionsTableProps) => {
     const [selectedRow, setSelectedRow] = useState<RowData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [sessionData, setSessionData] = useState<RowData>();
 
+    const { accessToken, handleRefreshToken } = useContext(AuthContext);
+    const { mutate: deleteSession } = useDeleteWorktimeSessionMutation(handleRefreshToken, accessToken!);
+
     const handleCloseModal = () => setIsModalOpen(false);
 
     const handleAddClick = () => {
         setIsEditMode(false);
-        setSessionData({ id: null, startSession: '', endSession: '', description: '' });
+        setSessionData({ id: null, start: '', end: '', description: '' });
         setIsModalOpen(true);
     };
 
@@ -38,6 +44,20 @@ const EmployeeSessionsTable = ({ data }: EmployeeSessionsTableProps) => {
             setSelectedRow(null);
         } else {
             setSelectedRow(row);
+        }
+    };
+
+    const handleDelete = (selectedRow: RowData) => {
+        const sessionId = selectedRow.id
+        if (sessionId) {
+            deleteSession(sessionId, {
+                onSuccess: () => {
+                    refetchGetUserSessionByIdData();
+                },
+                onError: (error) => {
+                    console.error('Error deleting session:', error);
+                },
+            });
         }
     };
 
@@ -66,7 +86,7 @@ const EmployeeSessionsTable = ({ data }: EmployeeSessionsTableProps) => {
                         variant="contained"
                         color="primary"
                         disabled={!selectedRow}
-                        onClick={() => console.log(selectedRow)}
+                        onClick={() => handleDelete(selectedRow!)}
                     >
                         Delete
                     </Button>
@@ -95,8 +115,8 @@ const EmployeeSessionsTable = ({ data }: EmployeeSessionsTableProps) => {
                                             onChange={() => handleRowClick(row)}
                                         />
                                     </TableCell>
-                                    <TableCell>{row.startSession}</TableCell>
-                                    <TableCell>{row.endSession}</TableCell>
+                                    <TableCell>{row.start}</TableCell>
+                                    <TableCell>{row.end}</TableCell>
                                     <TableCell>{row.description}</TableCell>
                                 </TableRow>
                             ))}
@@ -104,7 +124,7 @@ const EmployeeSessionsTable = ({ data }: EmployeeSessionsTableProps) => {
                     </Table>
                 </TableContainer>
             </div>
-            <EmployeeSessionModal open={isModalOpen} handleClose={handleCloseModal} isEditMode={isEditMode} sessionData={sessionData} />
+            <EmployeeSessionModal open={isModalOpen} handleClose={handleCloseModal} isEditMode={isEditMode} sessionData={sessionData} refetchGetUserSessionByIdData={refetchGetUserSessionByIdData} />
         </>
     );
 };

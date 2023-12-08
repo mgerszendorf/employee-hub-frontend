@@ -1,33 +1,39 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Radio, Button } from '@mui/material';
 import UserModal from '../madals/UserModal';
+import AuthContext from '../../context/AuthContext';
+import AdminActivationModal from '../madals/AdminActivationModal';
+import { useDeleteUserMutation } from '../../api/users/deleteUser.service';
 
 interface RowData {
-    id: number | null;
-    name: string;
-    surname: string;
-    department: string;
+    id: string | null;
+    firstName: string;
+    lastName: string;
     email: string;
     phoneNumber: string;
+    active: boolean;
 }
 
 interface UsersListTableProps {
     data: RowData[];
+    refetchUsers: () => Promise<any>;
 }
 
-const UsersListTable = ({ data }: UsersListTableProps) => {
+const UsersListTable = ({ data, refetchUsers }: UsersListTableProps) => {
+    const { accessToken, handleRefreshToken } = useContext(AuthContext);
+
     const [selectedRow, setSelectedRow] = useState<RowData | null>(null);
+    const [isActivationModalOpen, setIsActivationModalOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [sessionData, setSessionData] = useState<RowData>();
 
-    const handleCloseModal = () => setIsModalOpen(false);
+    const { mutate: deleteUser } = useDeleteUserMutation(handleRefreshToken, accessToken!);
 
-    const handleAddClick = () => {
-        setIsEditMode(false);
-        setSessionData({ id: null, name: '', surname: '', department: '', email: '', phoneNumber: '' });
-        setIsModalOpen(true);
-    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setIsActivationModalOpen(false)
+    }
 
     const handleEditClick = (selectedRow: RowData) => {
         setIsEditMode(true);
@@ -43,6 +49,24 @@ const UsersListTable = ({ data }: UsersListTableProps) => {
         }
     };
 
+    const handleActivation = () => {
+        setIsActivationModalOpen(true)
+    }
+
+    const handleDelete = (selectedRow: RowData) => {
+        const userId = selectedRow.id
+        if (userId) {
+            deleteUser(userId, {
+                onSuccess: () => {
+                    refetchUsers()
+                },
+                onError: (error) => {
+                    console.error('Error deleting session:', error);
+                },
+            });
+        }
+    };
+
     return (
         <>
             <div className='users-list-table-container'>
@@ -50,16 +74,8 @@ const UsersListTable = ({ data }: UsersListTableProps) => {
                     <Button
                         variant="contained"
                         color="primary"
-                        sx={{ mr: 2 }}
-                        onClick={() => handleAddClick()}
-                    >
-                        Add
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
                         disabled={!selectedRow}
-                        onClick={() => console.log(selectedRow)}
+                        onClick={() => handleActivation()}
                         sx={{ mr: 2 }}
                     >
                         Activate
@@ -77,7 +93,7 @@ const UsersListTable = ({ data }: UsersListTableProps) => {
                         variant="contained"
                         color="primary"
                         disabled={!selectedRow}
-                        onClick={() => console.log(selectedRow)}
+                        onClick={() => handleDelete(selectedRow!)}
                     >
                         Delete
                     </Button>
@@ -87,10 +103,10 @@ const UsersListTable = ({ data }: UsersListTableProps) => {
                         <TableHead>
                             <TableRow>
                                 <TableCell></TableCell>
+                                <TableCell>Active</TableCell>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Surname</TableCell>
-                                <TableCell>Department</TableCell>
-                                <TableCell>E-mail</TableCell>
+                                <TableCell>Email</TableCell>
                                 <TableCell>Phone number</TableCell>
                             </TableRow>
                         </TableHead>
@@ -108,9 +124,12 @@ const UsersListTable = ({ data }: UsersListTableProps) => {
                                             onChange={() => handleRowClick(row)}
                                         />
                                     </TableCell>
-                                    <TableCell>{row.name}</TableCell>
-                                    <TableCell>{row.surname}</TableCell>
-                                    <TableCell>{row.department}</TableCell>
+                                    {row.active ?
+                                        <TableCell style={{ color: 'green' }}>{row.active.toString()}</TableCell> :
+                                        <TableCell style={{ color: 'red' }}>{row.active.toString()}</TableCell>
+                                    }
+                                    <TableCell>{row.firstName}</TableCell>
+                                    <TableCell>{row.lastName}</TableCell>
                                     <TableCell>{row.email}</TableCell>
                                     <TableCell>{row.phoneNumber}</TableCell>
                                 </TableRow>
@@ -119,7 +138,8 @@ const UsersListTable = ({ data }: UsersListTableProps) => {
                     </Table>
                 </TableContainer>
             </div>
-            <UserModal open={isModalOpen} handleClose={handleCloseModal} isEditMode={isEditMode} sessionData={sessionData} />
+            <UserModal open={isModalOpen} handleClose={handleCloseModal} isEditMode={isEditMode} sessionData={sessionData} refetchUsers={refetchUsers} />
+            <AdminActivationModal open={isActivationModalOpen} handleClose={handleCloseModal} userId={selectedRow?.id} refetchUsers={refetchUsers} />
         </>
     );
 };

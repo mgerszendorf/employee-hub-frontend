@@ -6,16 +6,17 @@ import AuthContext from '../../context/AuthContext';
 
 interface RowData {
     id: string;
-    startSession: string;
-    endSession: string;
+    start: string;
+    end: string;
     description: string;
 }
 
 interface RecentUserSessionsTableProps {
     data: RowData[];
+    onRefresh: () => void;
 }
 
-const RecentUserSessionsTable: React.FC<RecentUserSessionsTableProps> = ({ data }) => {
+const RecentUserSessionsTable: React.FC<RecentUserSessionsTableProps> = ({ data, onRefresh }) => {
     const { accessToken, handleRefreshToken } = useContext(AuthContext);
     const { mutate: deleteSession } = useDeleteWorktimeSessionMutation(handleRefreshToken, accessToken!);
     const [selectedRow, setSelectedRow] = useState<string | null>(null);
@@ -32,7 +33,7 @@ const RecentUserSessionsTable: React.FC<RecentUserSessionsTableProps> = ({ data 
         if (sessionId) {
             deleteSession(sessionId, {
                 onSuccess: () => {
-                    console.log(`Session with ID ${sessionId} deleted successfully.`);
+                    onRefresh();
                 },
                 onError: (error) => {
                     console.error('Error deleting session:', error);
@@ -77,8 +78,8 @@ const RecentUserSessionsTable: React.FC<RecentUserSessionsTableProps> = ({ data 
                                         onChange={() => handleRowClick(row.id)}
                                     />
                                 </TableCell>
-                                <TableCell>{formatDate(row.startSession)}</TableCell>
-                                <TableCell>{formatDate(row.endSession)}</TableCell>
+                                <TableCell>{row.start ? formatDate(row.start) : ''}</TableCell>
+                                <TableCell>{row.end ? formatDate(row.end) : ''}</TableCell>
                                 <TableCell>{row.description}</TableCell>
                             </TableRow>
                         ))}

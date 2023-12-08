@@ -18,25 +18,28 @@ const UserHomePage = () => {
     } = useGetUserSessionByIdQuery(user?.id!, accessToken!);
 
     useEffect(() => {
-        if (getUserSessionByIdData && Array.isArray(getUserSessionByIdData.$values)) {
-            if (getUserSessionByIdData.$values[0].end) {
-                setIsStartSessionActive(false)
-                setIsFinishSessionActive(true)
+        if (getUserSessionByIdData && Array.isArray(getUserSessionByIdData.$values) && getUserSessionByIdData.$values.length > 0) {
+            if (getUserSessionByIdData.$values[0]?.end) {
+                setIsStartSessionActive(false);
+                setIsFinishSessionActive(true);
             } else {
-                setIsStartSessionActive(true)
-                setIsFinishSessionActive(false)
+                setIsStartSessionActive(true);
+                setIsFinishSessionActive(false);
             }
         }
-    }, [getUserSessionByIdData, refetchGetUserSessionByIdData])
+    }, [getUserSessionByIdData, refetchGetUserSessionByIdData]);
+
+    useEffect(() => {
+        refetchGetUserSessionByIdData();
+    }, [isStartSessionActive, isFinishSessionActive]);
+
 
     const transformedData = getUserSessionByIdData?.$values?.map(item => ({
         description: item.description,
         id: item.id,
-        startSession: item.start,
-        endSession: item.end
+        start: item.start,
+        end: item.end
     })) ?? [];
-
-
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -50,8 +53,9 @@ const UserHomePage = () => {
 
     const startSession = async () => {
         await handleWorktimeSession('');
-        refetchGetUserSessionByIdData()
+        refetchGetUserSessionByIdData();
     };
+
 
     const finishSession = () => {
         setIsModalOpen(true)
@@ -103,10 +107,7 @@ const UserHomePage = () => {
                     </Button>
                 </div>
                 <div className="recent-user-sessions">
-                    {getUserSessionByIdData ?
-                        <RecentUserSessionsTable data={transformedData} />
-                        : null
-                    }
+                    <RecentUserSessionsTable data={transformedData} onRefresh={refetchGetUserSessionByIdData} />
                 </div>
             </div>
             <WorktimeSessionModal open={isModalOpen} handleClose={handleCloseModal} refetchGetUserSessionByIdData={refetchGetUserSessionByIdData} />

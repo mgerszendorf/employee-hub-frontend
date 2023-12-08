@@ -1,10 +1,12 @@
 import { Modal, Box, TextField, Button, Typography } from '@mui/material';
+import { useUpdateUserByIdMutation } from '../../api/account/updateUserById.service';
+import { useContext, useEffect, useState } from 'react';
+import AuthContext from '../../context/AuthContext';
 
 interface UserData {
-    id: number | null;
-    name: string;
-    surname: string;
-    department: string;
+    id: string | null;
+    firstName: string;
+    lastName: string;
     email: string;
     phoneNumber: string;
 }
@@ -14,11 +16,55 @@ interface UserModalProps {
     handleClose: () => void;
     sessionData?: UserData;
     isEditMode: boolean;
+    refetchUsers: () => Promise<any>;
 }
 
-const UserModal = ({ open, handleClose, sessionData, isEditMode }: UserModalProps) => {
+const UserModal = ({ open, handleClose, sessionData, isEditMode, refetchUsers }: UserModalProps) => {
+    const { accessToken, handleRefreshToken } = useContext(AuthContext);
 
-    const defaultValues: UserData = isEditMode && sessionData ? sessionData : { id: null, name: '', surname: '', department: '', email: '', phoneNumber: '' };
+    // State initialization
+    const [formData, setFormData] = useState<UserData>({
+        id: sessionData?.id || null,
+        firstName: sessionData?.firstName || '',
+        lastName: sessionData?.lastName || '',
+        email: sessionData?.email || '',
+        phoneNumber: sessionData?.phoneNumber || '',
+    });
+
+    useEffect(() => {
+        if (isEditMode && sessionData) {
+            setFormData(sessionData);
+        }
+    }, [sessionData, isEditMode]);
+
+    const { mutate: updateUser } = useUpdateUserByIdMutation(handleRefreshToken, accessToken!);
+
+    const handleChange = (field: keyof UserData, value: string | number | null) => {
+        setFormData({ ...formData, [field]: value });
+    };
+
+    const handleUpdate = (sessionData: UserData) => {
+        const userId = sessionData.id;
+
+        const updatedData = {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            phoneNumber: formData.phoneNumber,
+        };
+
+        updateUser({
+            userId,
+            ...updatedData,
+        }, {
+            onSuccess: () => {
+                handleClose()
+                refetchUsers()
+            },
+            onError: (error) => {
+                console.error('Update error:', error);
+            },
+        });
+    };
 
     return (
         <Modal
@@ -41,52 +87,44 @@ const UserModal = ({ open, handleClose, sessionData, isEditMode }: UserModalProp
                 borderRadius: 1
             }}>
                 <Typography id="session-modal-title" variant="h6" component="h2">
-                    {isEditMode ? 'Edit Session' : 'Add Session'}
+                    {isEditMode ? 'Edit User' : 'Add User'}
                 </Typography>
 
                 <TextField
-                    label="Name"
+                    label="First Name"
                     multiline
                     rows={1}
                     fullWidth
                     sx={{ mt: 2 }}
-                    defaultValue={defaultValues.name}
+                    value={formData.firstName}
+                    onChange={(e) => handleChange('firstName', e.target.value)}
                 />
-
                 <TextField
-                    label="Surname"
+                    label="Last Name"
                     multiline
                     rows={1}
                     fullWidth
                     sx={{ mt: 2 }}
-                    defaultValue={defaultValues.surname}
+                    value={formData.lastName}
+                    onChange={(e) => handleChange('lastName', e.target.value)}
                 />
-
                 <TextField
-                    label="Department"
+                    label="Email"
                     multiline
                     rows={1}
                     fullWidth
                     sx={{ mt: 2 }}
-                    defaultValue={defaultValues.department}
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
                 />
-
                 <TextField
-                    label="E-mail"
+                    label="Phone Number"
                     multiline
                     rows={1}
                     fullWidth
                     sx={{ mt: 2 }}
-                    defaultValue={defaultValues.email}
-                />
-
-                <TextField
-                    label="Phone number"
-                    multiline
-                    rows={1}
-                    fullWidth
-                    sx={{ mt: 2 }}
-                    defaultValue={defaultValues.phoneNumber}
+                    value={formData.phoneNumber}
+                    onChange={(e) => handleChange('phoneNumber', e.target.value)}
                 />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
@@ -94,7 +132,7 @@ const UserModal = ({ open, handleClose, sessionData, isEditMode }: UserModalProp
                         variant="contained"
                         color="primary"
                         sx={{ mr: 1 }}
-                        onClick={handleClose}
+                        onClick={() => handleUpdate(sessionData!)}
                     >
                         Save
                     </Button>

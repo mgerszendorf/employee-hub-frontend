@@ -1,21 +1,22 @@
-import { useMutation, UseMutationOptions } from 'react-query';
+import { useQuery } from 'react-query';
 import { createAxiosInstance } from '../axiosInstance';
 import { ErrorResponse } from '../../types/account/error.types';
+import { GetSupervisors } from '../../types/users/getSupervisors.type';
 
-export const useDeleteWorktimeSessionMutation = (
+export const useGetAllSupervisorsQuery = (
     handleRefreshToken: () => Promise<void>,
-    accessToken: string,
-    options?: UseMutationOptions<void, ErrorResponse, string>
+    accessToken: string
 ) => {
     const axiosInstance = createAxiosInstance(handleRefreshToken);
 
-    const deleteWorktimeSession = async (sessionId: string): Promise<void> => {
+    const fetchSupervisors = async (): Promise<GetSupervisors> => {
         try {
-            await axiosInstance.delete(`/worktime-session/${sessionId}`, {
+            const { data } = await axiosInstance.get(`/users/supervisors`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
+            return data;
         } catch (error: unknown) {
             const errorData = (error as ErrorResponse)?.response?.data;
             if (errorData?.errors) {
@@ -27,8 +28,5 @@ export const useDeleteWorktimeSessionMutation = (
         }
     };
 
-    return useMutation<void, ErrorResponse, string>(
-        deleteWorktimeSession,
-        options,
-    );
+    return useQuery('supervisors', fetchSupervisors);
 };

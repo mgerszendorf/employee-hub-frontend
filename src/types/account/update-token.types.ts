@@ -1,10 +1,10 @@
-export type UpdateTokenResponse = {
+export interface UpdateTokenResponse {
   tokenType: string;
   accessToken: string;
   expiresIn: number;
   refreshToken: string;
 };
 
-export type UpdateTokenPayload = {
+export interface UpdateTokenPayload {
   refreshToken: string;
 };

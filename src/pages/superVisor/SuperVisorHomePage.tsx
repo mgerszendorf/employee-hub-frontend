@@ -1,22 +1,13 @@
 import { Button } from "@mui/material"
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import EmployeeListTable from "../../components/tabels/EmployeeListTable";
+import AuthContext from "../../context/AuthContext";
+import { useFetchAllUsers } from "../../api/users/getUsers.service";
 
 const SuperVisorHomePage = () => {
+    const { user } = useContext(AuthContext);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleString());
-
-    const sampleData = [
-        { id: 1, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 2, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 3, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 4, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 5, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 6, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 7, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 8, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 9, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-        { id: 10, name: 'Jan', surname: 'Nowak', department: 'Department 1', email: 'jan.nowak@gmail.com', phoneNumber: '748349234' },
-    ];
+    const { data: users } = useFetchAllUsers();
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -26,13 +17,32 @@ const SuperVisorHomePage = () => {
         return () => clearInterval(timer);
     }, []);
 
+    const handleLogOut = () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        location.reload()
+    }
+
+    const transformedData = users?.$values?.map(item => ({
+        id: item.id,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        email: item.email,
+        phoneNumber: item.phoneNumber,
+    })) ?? [];
+
     return (
         <div className="super-visor-home-page-container">
             <div className="top-bar">
                 <div>
-                    <p>Marek Gerszendorf</p>
+                    {(user?.firstName && user?.lastName) ?
+                        <p>{user?.firstName + ' ' + user?.lastName}</p>
+                        :
+                        <p>Hello!</p>}
                     <Button
                         variant="contained"
+                        onClick={handleLogOut}
                     >
                         Log Out
                     </Button>
@@ -42,7 +52,7 @@ const SuperVisorHomePage = () => {
                 </div>
             </div>
             <div className="employee-list">
-                <EmployeeListTable data={sampleData} />
+                <EmployeeListTable data={transformedData} />
             </div>
         </div>
     )

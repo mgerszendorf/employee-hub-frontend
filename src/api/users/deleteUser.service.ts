@@ -2,16 +2,16 @@ import { useMutation, UseMutationOptions } from 'react-query';
 import { createAxiosInstance } from '../axiosInstance';
 import { ErrorResponse } from '../../types/account/error.types';
 
-export const useDeleteWorktimeSessionMutation = (
+export const useDeleteUserMutation = (
     handleRefreshToken: () => Promise<void>,
     accessToken: string,
     options?: UseMutationOptions<void, ErrorResponse, string>
 ) => {
     const axiosInstance = createAxiosInstance(handleRefreshToken);
 
-    const deleteWorktimeSession = async (sessionId: string): Promise<void> => {
+    const deleteUser = async (userId: string): Promise<void> => {
         try {
-            await axiosInstance.delete(`/worktime-session/${sessionId}`, {
+            await axiosInstance.delete(`/users/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
@@ -28,7 +28,7 @@ export const useDeleteWorktimeSessionMutation = (
     };
 
     return useMutation<void, ErrorResponse, string>(
-        deleteWorktimeSession,
+        deleteUser,
         options,
     );
 };

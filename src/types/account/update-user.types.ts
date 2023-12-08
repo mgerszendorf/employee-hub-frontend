@@ -1,10 +1,10 @@
-export type UpdateUserPayload = {
+export interface UpdateUserPayload {
   firstName: string;
   lastName: string;
   phoneNumber: string;
 };
 
-export type UpdateTokenResponse = {
+export interface UpdateTokenResponse {
   id: string;
   firstName: string;
   lastName: string;

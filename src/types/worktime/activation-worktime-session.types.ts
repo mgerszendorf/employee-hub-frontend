@@ -1,12 +1,12 @@
-export type WorktimeSessionResponse = {
+export interface WorktimeSessionResponse {
     state: string;
     sessionInfo: SessionInfo;
 };
 
-export type SessionInfo = {
+export interface SessionInfo {
     description: string
 }
 
-export type WorktimeSessionPayload = {
+export interface WorktimeSessionPayload {
     description: string
 };

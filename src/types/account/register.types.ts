@@ -1,8 +1,8 @@
-export type RegisterResponse = {
+export interface RegisterResponse {
   status: number;
 };
 
-export type RegisterPayload = {
+export interface RegisterPayload {
   email: string;
   password: string;
 };

@@ -10,7 +10,7 @@ export const useLoginMutation = (
 ) => {
     const axiosInstance = createAxiosInstance(handleRefreshToken);
 
-    const fetchDataAfterLogin = async (token: any) => {
+    const fetchDataAfterLogin = async (token: string) => {
         try {
             const response = await axiosInstance.get('/users/data', {
                 headers: { Authorization: `Bearer ${token}` }

@@ -1,8 +1,8 @@
-export type UserSessionResponse = {
+export interface UserSessionResponse {
     $values: [SessionData] | null;
 };
 
-export type SessionData = {
+export interface SessionData {
     description: string,
     id: string,
     start: string,
@@ -10,6 +10,6 @@ export type SessionData = {
     employeeId: string
 }
 
-export type UserSessionPayload = {
+export interface UserSessionPayload {
     id: string
 };

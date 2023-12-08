@@ -1,9 +1,14 @@
 import { Modal, Box, TextField, Button, Typography } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
+import AuthContext from '../../context/AuthContext';
+import { useUpdateWorktimeSessionMutation } from '../../api/worktime/updateWorktimeSession.service';
+import { useAddWorktimeSessionMutation } from '../../api/worktime/addWorktimeSession.service';
+import { useParams } from 'react-router-dom';
 
 interface EmployeeSessionData {
-    id: number | null;
-    startSession: string;
-    endSession: string;
+    id: string | null;
+    start: string;
+    end: string;
     description: string;
 }
 
@@ -12,11 +17,65 @@ interface EmployeeSessionModalProps {
     handleClose: () => void;
     sessionData?: EmployeeSessionData;
     isEditMode: boolean;
+    refetchGetUserSessionByIdData: () => Promise<any>;
 }
 
-const EmployeeSessionModal = ({ open, handleClose, sessionData, isEditMode }: EmployeeSessionModalProps) => {
+const EmployeeSessionModal = ({ open, handleClose, sessionData, isEditMode, refetchGetUserSessionByIdData }: EmployeeSessionModalProps) => {
+    const { accessToken, handleRefreshToken, user } = useContext(AuthContext);
+    const { id } = useParams();
 
-    const defaultValues: EmployeeSessionData = isEditMode && sessionData ? sessionData : { id: null, startSession: '', endSession: '', description: '' };
+    // State initialization
+    const [formData, setFormData] = useState<any>({
+        start: sessionData?.start || '',
+        end: sessionData?.end || '',
+        description: sessionData?.description || ''
+    });
+
+    useEffect(() => {
+        if (isEditMode && sessionData) {
+            setFormData(sessionData);
+        }
+    }, [sessionData, isEditMode]);
+
+    const { mutate: addWorktimeSession } = useAddWorktimeSessionMutation(handleRefreshToken, accessToken!);
+    const { mutate: updateWorktimeSession } = useUpdateWorktimeSessionMutation(handleRefreshToken, accessToken!);
+
+    const handleChange = (field: keyof EmployeeSessionData, value: string) => {
+        setFormData({ ...formData, [field]: value });
+    };
+
+    const handleSave = () => {
+        const sessionId = formData.id
+
+        const sessionPayload = {
+            ...formData,
+            employeeId: user?.employeeAccount.id
+        };
+
+        if (isEditMode && formData.id) {
+            updateWorktimeSession({
+                sessionId,
+                ...sessionPayload
+            }, {
+                onSuccess: () => {
+                    handleClose()
+                    refetchGetUserSessionByIdData()
+                },
+                onError: (error) => console.error('Update error:', error)
+            });
+        } else {
+            addWorktimeSession({
+                userId: id,
+                ...sessionPayload
+            }, {
+                onSuccess: () => {
+                    handleClose()
+                    refetchGetUserSessionByIdData()
+                },
+                onError: (error: any) => console.error('Add error:', error)
+            });
+        }
+    };
 
     return (
         <Modal
@@ -50,7 +109,8 @@ const EmployeeSessionModal = ({ open, handleClose, sessionData, isEditMode }: Em
                     InputLabelProps={{
                         shrink: true,
                     }}
-                    defaultValue={defaultValues.startSession}
+                    value={formData.start}
+                    onChange={(e) => handleChange('start', e.target.value)}
                 />
                 <TextField
                     label="End session"
@@ -60,7 +120,8 @@ const EmployeeSessionModal = ({ open, handleClose, sessionData, isEditMode }: Em
                     InputLabelProps={{
                         shrink: true,
                     }}
-                    defaultValue={defaultValues.endSession}
+                    value={formData.end}
+                    onChange={(e) => handleChange('end', e.target.value)}
                 />
                 <TextField
                     label="Description"
@@ -68,7 +129,8 @@ const EmployeeSessionModal = ({ open, handleClose, sessionData, isEditMode }: Em
                     rows={4}
                     fullWidth
                     sx={{ mt: 2 }}
-                    defaultValue={defaultValues.description}
+                    value={formData.description}
+                    onChange={(e) => handleChange('description', e.target.value)}
                 />
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
@@ -76,10 +138,11 @@ const EmployeeSessionModal = ({ open, handleClose, sessionData, isEditMode }: Em
                         variant="contained"
                         color="primary"
                         sx={{ mr: 1 }}
-                        onClick={handleClose}
+                        onClick={handleSave}
                     >
-                        Save
+                        {isEditMode ? 'Update' : 'Add'}
                     </Button>
+
                     <Button variant="outlined" onClick={handleClose}>
                         Cancel
                     </Button>
